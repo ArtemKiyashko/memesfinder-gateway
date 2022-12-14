@@ -1,9 +1,12 @@
 ﻿using System;
 using Azure.Identity;
 using MemesFinderGateway.Extensions;
+using MemesFinderGateway.Options;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 [assembly: FunctionsStartup(typeof(MemesFinderGateway.Startup))]
 namespace MemesFinderGateway
@@ -23,6 +26,16 @@ namespace MemesFinderGateway
                     new DefaultAzureCredential());
 
             _functionConfig = configBuilder.Build();
+
+            builder.Services.Configure<ServiceBusOptions>(_functionConfig.GetSection("ServiceBusOptions"));
+
+            builder.Services.AddAzureClients(clientBuilder =>
+            {
+                var provider = builder.Services.BuildServiceProvider();
+
+                clientBuilder.UseCredential(new DefaultAzureCredential());
+                clientBuilder.AddServiceBusClientWithNamespace(provider.GetRequiredService<IOptions<ServiceBusOptions>>().Value.FullyQualifiedNamespace);
+            });
 
             builder.Services.AddLogging();
         }

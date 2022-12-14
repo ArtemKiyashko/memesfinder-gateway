@@ -8,13 +8,22 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Telegram.Bot.Types;
+using Azure.Messaging.ServiceBus;
+using Microsoft.Extensions.Options;
+using MemesFinderGateway.Options;
+using MemesFinderGateway.Extensions;
 
 namespace MemesFinderGateway
 {
     public class MemesFinderGateway
     {
-        public MemesFinderGateway()
+        private readonly ServiceBusClient _serviceBusClient;
+        private readonly ServiceBusOptions _options;
+
+        public MemesFinderGateway(ServiceBusClient serviceBusClient, IOptions<ServiceBusOptions> options)
         {
+            _serviceBusClient = serviceBusClient;
+            _options = options.Value;
         }
 
         [FunctionName("MemesFinderGateway")]
@@ -22,7 +31,22 @@ namespace MemesFinderGateway
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] Update tgUpdate,
             ILogger log)
         {
-            return new OkObjectResult(tgUpdate.Message is null ? tgUpdate.EditedMessage.Text : tgUpdate.Message.Text);
+            string messageString = tgUpdate.ToJson();
+            log.LogInformation($"Update received: {messageString}");
+
+            try
+            {
+                await using ServiceBusSender sender = _serviceBusClient.CreateSender(_options.TargetTopicName);
+                ServiceBusMessage serviceBusMessage = new ServiceBusMessage(tgUpdate.ToJson());
+                await sender.SendMessageAsync(serviceBusMessage);
+
+                return new OkResult();
+            }
+            catch (Exception ex)
+            {
+                log.LogError(ex, "Error sending to service bus: {0}", messageString);
+                return new BadRequestObjectResult("Something went wrong, try again later");
+            }
         }
     }
 }

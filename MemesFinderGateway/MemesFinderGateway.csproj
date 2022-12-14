@@ -9,6 +9,8 @@
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.2" />
     <PackageReference Include="Azure.Identity" Version="1.8.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.1" />
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Telegram.Bot" />
@@ -16,6 +18,9 @@
     <None Remove="Extensions\" />
     <None Remove="Azure.Extensions.AspNetCore.Configuration.Secrets" />
     <None Remove="Azure.Identity" />
+    <None Remove="Azure.Messaging.ServiceBus" />
+    <None Remove="Microsoft.Extensions.Azure" />
+    <None Remove="Options\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -28,5 +33,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensions\" />
+    <Folder Include="Options\" />
   </ItemGroup>
 </Project>
