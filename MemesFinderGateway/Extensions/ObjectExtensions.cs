@@ -5,7 +5,7 @@ namespace MemesFinderGateway.Extensions
 {
 	public static class ObjectExtensions
 	{
-		public static string ToJson(this object update) => update is null ? null : JsonConvert.SerializeObject(update);
+		public static string ToJson(this object update) => update is null ? default : JsonConvert.SerializeObject(update);
 	}
 }
 

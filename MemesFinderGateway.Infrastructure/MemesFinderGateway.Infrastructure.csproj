@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DependencyInjection\" />
+    <None Remove="Microsoft.Extensions.DependencyInjection" />
+    <None Remove="Microsoft.Extensions.Configuration" />
+    <None Remove="Microsoft.Extensions.Options" />
+    <None Remove="Microsoft.Extensions.Configuration.Abstractions" />
+    <None Remove="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DependencyInjection\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MemesFinderGateway.Interfaces\MemesFinderGateway.Interfaces.csproj" />
+    <ProjectReference Include="..\MemesFinderGateway.Managers\MemesFinderGateway.Managers.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+  </ItemGroup>
+</Project>

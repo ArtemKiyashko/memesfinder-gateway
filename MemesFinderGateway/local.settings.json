@@ -4,7 +4,7 @@
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "ServiceBusOptions__fullyQualifiedNamespace": "sbweprivatememesfinder.servicebus.windows.net",
-        "ServiceBusOptions__TargetTopicName": "allmessages",
-        "KeyVaultName": "kvweprivatememesfinder"
+        "ServiceBusOptions__AllMessagesTopic": "allmessages",
+        "RollDiceDecisionMakerOptions__RangeTop": 2
     }
 }

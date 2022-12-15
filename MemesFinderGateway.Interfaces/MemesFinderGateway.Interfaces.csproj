@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DecisionMaker\" />
+    <None Remove="Telegram.Bot" />
+    <None Remove="AzureClients\" />
+    <None Remove="Azure.Messaging.ServiceBus" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DecisionMaker\" />
+    <Folder Include="AzureClients\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Telegram.Bot" Version="18.0.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.1" />
+  </ItemGroup>
+</Project>

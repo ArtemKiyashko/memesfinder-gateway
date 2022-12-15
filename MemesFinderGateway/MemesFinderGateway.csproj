@@ -11,6 +11,7 @@
     <PackageReference Include="Azure.Identity" Version="1.8.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.1" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.ApplicationInsights" Version="2.21.0" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Telegram.Bot" />
@@ -21,6 +22,9 @@
     <None Remove="Azure.Messaging.ServiceBus" />
     <None Remove="Microsoft.Extensions.Azure" />
     <None Remove="Options\" />
+    <None Remove="AzureClients\" />
+    <None Remove="Microsoft.Extensions.Options" />
+    <None Remove="Microsoft.Extensions.Logging.ApplicationInsights" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
@@ -34,5 +38,14 @@
   <ItemGroup>
     <Folder Include="Extensions\" />
     <Folder Include="Options\" />
+    <Folder Include="AzureClients\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MemesFinderGateway.Interfaces\MemesFinderGateway.Interfaces.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\MemesFinderGateway.Infrastructure\MemesFinderGateway.Infrastructure.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
 </Project>
