@@ -3,7 +3,7 @@
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-        "ServiceBusOptions__fullyQualifiedNamespace": "sbweprivatememesfinder.servicebus.windows.net",
+        "ServiceBusOptions__FullyQualifiedNamespace": "sbweprivatememesfinder.servicebus.windows.net",
         "ServiceBusOptions__AllMessagesTopic": "allmessages",
         "RollDiceDecisionMakerOptions__RangeTop": 2
     }
