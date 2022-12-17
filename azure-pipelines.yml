@@ -10,9 +10,6 @@ variables:
   # Azure Resource Manager connection created during pipeline creation
   azureSubscription: 'e8c7baba-52b7-4530-b7f9-0537c8253cff'
 
-  # Function app name
-  functionAppName: 'faweprivatememesfindergateway'
-
   # Agent VM image name
   vmImageName: 'windows-2019'
 
@@ -59,6 +56,8 @@ stages:
   - deployment: DeployTest
     displayName: Deploy Test
     environment: 'Test'
+    variables:
+     - group: Test
     pool:
       vmImage: $(vmImageName)
 
@@ -72,12 +71,14 @@ stages:
             inputs:
               azureSubscription: '$(azureSubscription)'
               appType: functionApp
-              appName: $(functionAppName)
+              appName: $(functionappname_gateway)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
   - deployment: DeployProd
     dependsOn: DeployTest
     displayName: Deploy Production
     environment: 'Production'
+    variables:
+     - group: Production
     pool:
       vmImage: $(vmImageName)
 
@@ -91,5 +92,5 @@ stages:
             inputs:
               azureSubscription: '$(azureSubscription)'
               appType: functionApp
-              appName: $(functionAppName)
+              appName: faweprivatememesfindergateway
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
