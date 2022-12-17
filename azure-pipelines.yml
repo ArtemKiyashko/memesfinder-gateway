@@ -56,9 +56,28 @@ stages:
   condition: succeeded()
 
   jobs:
-  - deployment: Deploy
-    displayName: Deploy
-    environment: 'development'
+  - deployment: DeployTest
+    displayName: Deploy Test
+    environment: 'Test'
+    pool:
+      vmImage: $(vmImageName)
+
+    strategy:
+      runOnce:
+        deploy:
+
+          steps:
+          - task: AzureFunctionApp@1
+            displayName: 'Azure functions app deploy'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              appType: functionApp
+              appName: $(functionAppName)
+              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+  - deployment: DeployProd
+    dependsOn: DeployTest
+    displayName: Deploy Production
+    environment: 'Production'
     pool:
       vmImage: $(vmImageName)
 
