@@ -92,5 +92,5 @@ stages:
             inputs:
               azureSubscription: '$(azureSubscription)'
               appType: functionApp
-              appName: faweprivatememesfindergateway
+              appName: $(functionappname_gateway)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
