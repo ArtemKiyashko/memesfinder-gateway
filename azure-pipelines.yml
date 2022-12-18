@@ -73,7 +73,7 @@ stages:
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
   - deployment: DeployProd
     dependsOn: DeployTest
-    condition: and(succeeded('DeployTest'), ne(variables['Build.Reason'], 'PullRequest')))
+    condition: and(succeeded('DeployTest'), ne(variables['Build.Reason'], 'PullRequest'))
     displayName: Deploy Production
     environment: 'Production'
     variables:
