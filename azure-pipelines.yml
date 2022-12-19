@@ -53,7 +53,7 @@ stages:
   condition: succeeded('Build')
   jobs:
   - deployment: Test
-    displayName: Deploy ${{ variables.functionappname_gateway }}
+    displayName: Deploy Gateway
     environment: 'Test'
     variables:
      - group: Test
@@ -77,7 +77,7 @@ stages:
   condition: and(succeeded('DeployTest'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment: Prod
-    displayName: Deploy ${{ variables.functionappname_gateway }}
+    displayName: Deploy Gateway
     environment: 'Production'
     variables:
      - group: Production
