@@ -18,7 +18,7 @@ variables:
 
 stages:
 - stage: Build
-  displayName: Build stage
+  displayName: Build And Test
 
   jobs:
   - job: Build
@@ -53,7 +53,7 @@ stages:
   condition: succeeded('Build')
   jobs:
   - deployment: Test
-    displayName: Deploy Test
+    displayName: Deploy $(functionappname_gateway)
     environment: 'Test'
     variables:
      - group: Test
@@ -70,13 +70,14 @@ stages:
               appType: functionApp
               appName: $(functionappname_gateway)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+              
 - stage: DeployProd
   displayName: Deploy Production
   dependsOn: DeployTest
   condition: and(succeeded('DeployTest'), ne(variables['Build.Reason'], 'PullRequest'))
   jobs:
   - deployment: Prod
-    displayName: Deploy Production
+    displayName: Deploy $(functionappname_gateway)
     environment: 'Production'
     variables:
      - group: Production
