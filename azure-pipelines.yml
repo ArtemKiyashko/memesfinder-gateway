@@ -7,8 +7,8 @@ trigger:
 - master
 
 variables:
-  # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: 'e8c7baba-52b7-4530-b7f9-0537c8253cff'
+  # Azure Resource Manager connection
+  azureSubscription: 'Azure Vostok (60447d26-d388-4a2b-a8cd-45114f7099a8)'
 
   # Agent VM image name
   vmImageName: 'windows-2019'
@@ -18,7 +18,7 @@ variables:
 
 stages:
 - stage: Build
-  displayName: Build stage
+  displayName: Build And Test
 
   jobs:
   - job: Build
@@ -47,24 +47,21 @@ stages:
     - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
       artifact: drop
 
-- stage: Deploy
-  displayName: Deploy stage
+- stage: DeployTest
+  displayName: Deploy Test
   dependsOn: Build
-  condition: succeeded()
-
+  condition: succeeded('Build')
   jobs:
-  - deployment: DeployTest
-    displayName: Deploy Test
+  - deployment: Test
+    displayName: Deploy Gateway
     environment: 'Test'
     variables:
      - group: Test
     pool:
       vmImage: $(vmImageName)
-
     strategy:
       runOnce:
         deploy:
-
           steps:
           - task: AzureFunctionApp@1
             displayName: 'Azure functions app deploy'
@@ -73,24 +70,27 @@ stages:
               appType: functionApp
               appName: $(functionappname_gateway)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
-  - deployment: DeployProd
-    dependsOn: DeployTest
-    displayName: Deploy Production
+
+- stage: DeployProd
+  displayName: Deploy Production
+  dependsOn: DeployTest
+  condition: and(succeeded('DeployTest'), ne(variables['Build.Reason'], 'PullRequest'))
+  jobs:
+  - deployment: Prod
+    displayName: Deploy Gateway
     environment: 'Production'
     variables:
      - group: Production
     pool:
       vmImage: $(vmImageName)
-
     strategy:
       runOnce:
         deploy:
-
           steps:
           - task: AzureFunctionApp@1
             displayName: 'Azure functions app deploy'
             inputs:
               azureSubscription: '$(azureSubscription)'
               appType: functionApp
-              appName: faweprivatememesfindergateway
+              appName: $(functionappname_gateway)
               package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
