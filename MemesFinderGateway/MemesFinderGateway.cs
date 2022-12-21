@@ -16,28 +16,27 @@ namespace MemesFinderGateway
 {
     public class MemesFinderGateway
     {
-        private readonly ILogger<MemesFinderGateway> _logger;
         private readonly IServiceBusClient _serviceBusClient;
         private readonly IDecisionMakerManager _deciscionMakerManager;
 
-        public MemesFinderGateway(ILogger<MemesFinderGateway> logger, IServiceBusClient serviceBusClient, IDecisionMakerManager deciscionMakerManager)
+        public MemesFinderGateway(IServiceBusClient serviceBusClient, IDecisionMakerManager deciscionMakerManager)
         {
-            _logger = logger;
             _serviceBusClient = serviceBusClient;
             _deciscionMakerManager = deciscionMakerManager;
         }
 
         [FunctionName("MemesFinderGateway")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] Update tgUpdate)
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] Update tgUpdate,
+            ILogger log)
         {
             string messageString = tgUpdate.ToJson();
-            _logger.LogInformation($"Update received: {messageString}");
+            log.LogInformation($"Update received: {messageString}");
 
             var decision = await _deciscionMakerManager.GetFinalDecisionAsync(tgUpdate);
 
             if (!decision.Decision)
-                return new OkObjectResult(decision.Messages.Aggregate((f, s) => $"{f}{Environment.NewLine}{s}"));
+                return HandleNegativeDecision(log, decision);
 
             try
             {
@@ -49,9 +48,16 @@ namespace MemesFinderGateway
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending to service bus: {0}", messageString);
+                log.LogError(ex, "Error sending to service bus: {0}", messageString);
                 return new BadRequestObjectResult("Something went wrong, try again later");
             }
+        }
+
+        private static IActionResult HandleNegativeDecision(ILogger log, DecisionManagerResult decision)
+        {
+            var aggregatedMessages = decision.Messages.Aggregate((f, s) => $"{f}{Environment.NewLine}{s}");
+            log.LogInformation($"Negative decision taken: {aggregatedMessages}");
+            return new OkObjectResult(aggregatedMessages);
         }
     }
 }

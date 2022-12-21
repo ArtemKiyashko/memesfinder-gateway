@@ -38,9 +38,7 @@ namespace MemesFinderGateway
 
             builder.Services.AddDecisionManager(_functionConfig);
 
-            builder.Services
-                .AddLogging()
-                .AddScoped<ILogger>(provider => provider.GetRequiredService<ILogger<MemesFinderGateway>>());
+            builder.Services.AddLogging();
         }
     }
 }

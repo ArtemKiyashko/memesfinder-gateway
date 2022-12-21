@@ -1,5 +1,4 @@
 ﻿using MemesFinderGateway.Interfaces.DecisionMaker;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Types;
 
@@ -9,14 +8,12 @@ namespace MemesFinderGateway.Managers.DecisionMaker
 	{
 		private readonly Random _random;
         private readonly RollDiceDecisionMakerOptions _options;
-        private readonly ILogger _logger;
-        private const int DICE_SUCCESS_VALUE = 0;
+		private const int DICE_SUCCESS_VALUE = 0;
 
-        public RollDiceDecisionMaker(IOptions<RollDiceDecisionMakerOptions> options, ILogger logger)
+        public RollDiceDecisionMaker(IOptions<RollDiceDecisionMakerOptions> options)
 		{
 			_random = new Random();
 			_options = options.Value;
-            _logger = logger;
         }
 
 		public ValueTask<Decision> GetDecisionAsync(Update tgUpdate)
@@ -26,12 +23,9 @@ namespace MemesFinderGateway.Managers.DecisionMaker
 			if (diceValue == DICE_SUCCESS_VALUE)
 				return ValueTask.FromResult(new Decision(true));
 
-			var decisionMessage = $"No luck this time. Expected value: {DICE_SUCCESS_VALUE}, but was: {diceValue}";
-            _logger.LogInformation(decisionMessage);
-
-            return ValueTask.FromResult(new Decision(
+			return ValueTask.FromResult(new Decision(
 				false,
-                decisionMessage));
+				$"No luck this time. Expected value: {DICE_SUCCESS_VALUE}, but was: {diceValue}"));
 		}
     }
 }
