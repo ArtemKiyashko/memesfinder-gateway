@@ -12,7 +12,7 @@ namespace MemesFinderGateway.Managers.DecisionMaker
 
         public RollDiceDecisionMaker(IOptions<RollDiceDecisionMakerOptions> options)
 		{
-			_random = new Random();
+			_random = Random.Shared;
 			_options = options.Value;
         }
 
