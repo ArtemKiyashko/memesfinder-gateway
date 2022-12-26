@@ -26,7 +26,7 @@ namespace MemesFinderGateway.Managers.DecisionMaker
 
             var finalDecisionResult = new DecisionManagerResult(
                 !decisions.Any(decision => decision.DecisionResult == false),
-                decisions.Select(decision => decision.Message));
+                decisions.Where(decision => !string.IsNullOrEmpty(decision.Message)).Select(decision => decision.Message));
 
             return finalDecisionResult;
         }

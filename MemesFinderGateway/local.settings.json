@@ -5,6 +5,7 @@
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "ServiceBusOptions__FullyQualifiedNamespace": "sbwetestmemesfinder.servicebus.windows.net",
         "ServiceBusOptions__AllMessagesTopic": "allmessages",
-        "RollDiceDecisionMakerOptions__RangeTop": 2
+        "RollDiceDecisionMakerOptions__RangeTop": 2,
+        "ChatWhitelistDecisionMakerOptions__AllowedChatIds": "12;13;-5"
     }
 }

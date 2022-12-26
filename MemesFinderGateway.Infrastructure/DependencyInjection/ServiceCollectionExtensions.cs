@@ -10,9 +10,12 @@ namespace MemesFinderGateway.Infrastructure.DependencyInjection
 		public static IServiceCollection AddDecisionManager(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.Configure<RollDiceDecisionMakerOptions>(configuration.GetSection("RollDiceDecisionMakerOptions"));
-			services.AddTransient<IDecisionMaker, RollDiceDecisionMaker>();
+            services.AddTransient<IDecisionMaker, RollDiceDecisionMaker>();
 
-			services.AddTransient<IDecisionMakerManager, DecisionMakerManager>();
+            services.Configure<ChatWhitelistDecisionMakerOptions>(configuration.GetSection("ChatWhitelistDecisionMakerOptions"));
+            services.AddTransient<IDecisionMaker, ChatWhitelistDecisionMaker>();
+
+            services.AddTransient<IDecisionMakerManager, DecisionMakerManager>();
 			return services;
 		}
 	}
