@@ -1,16 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+﻿using Azure.Messaging.ServiceBus;
+using MemesFinderGateway.Extensions;
+using MemesFinderGateway.Interfaces.AzureClients;
+using MemesFinderGateway.Interfaces.DecisionMaker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types;
-using Azure.Messaging.ServiceBus;
-using MemesFinderGateway.Extensions;
-using MemesFinderGateway.Interfaces.AzureClients;
-using MemesFinderGateway.Interfaces.DecisionMaker;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Telegram.Bot.Types;
 
 namespace MemesFinderGateway
 {
@@ -33,11 +32,22 @@ namespace MemesFinderGateway
             string messageString = tgUpdate.ToJson();
             log.LogInformation($"Update received: {messageString}");
 
+            //if messageString contains "хочу мем" then send to SendMessageToServiceBus
+            if (messageString.Contains("хочу мем"))
+            {
+                return await SendMessageToServiceBus(log, messageString);
+            }
+
             var decision = await _deciscionMakerManager.GetFinalDecisionAsync(tgUpdate);
 
             if (!decision.Decision)
                 return HandleNegativeDecision(log, decision);
 
+            return await SendMessageToServiceBus(log, messageString);
+        }
+
+        private async Task<IActionResult> SendMessageToServiceBus(ILogger log, string messageString)
+        {
             try
             {
                 await using ServiceBusSender sender = _serviceBusClient.CreateSender();
