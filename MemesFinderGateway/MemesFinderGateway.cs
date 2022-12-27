@@ -55,7 +55,8 @@ namespace MemesFinderGateway
 
         private static IActionResult HandleNegativeDecision(ILogger log, DecisionManagerResult decision)
         {
-            var aggregatedMessages = decision.Messages.Aggregate((f, s) => $"{f}{Environment.NewLine}{s}");
+            var aggregatedMessages = decision.Messages
+                .Aggregate((f, s) => $"{f}{Environment.NewLine}{s}");
             log.LogInformation($"Negative decision taken: {aggregatedMessages}");
             return new OkObjectResult(aggregatedMessages);
         }
