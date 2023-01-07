@@ -32,12 +32,6 @@ namespace MemesFinderGateway
             string messageString = tgUpdate.ToJson();
             log.LogInformation($"Update received: {messageString}");
 
-            //if messageString contains "хочу мем" then send to SendMessageToServiceBus
-            if (messageString.Contains("хочу мем"))
-            {
-                return await SendMessageToServiceBus(log, messageString);
-            }
-
             var decision = await _deciscionMakerManager.GetFinalDecisionAsync(tgUpdate);
 
             if (!decision.Decision)
