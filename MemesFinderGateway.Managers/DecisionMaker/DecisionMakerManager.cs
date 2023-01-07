@@ -4,13 +4,13 @@ using Telegram.Bot.Types;
 
 namespace MemesFinderGateway.Managers.DecisionMaker
 {
-	public class DecisionMakerManager : IDecisionMakerManager
-	{
+    public class DecisionMakerManager : IDecisionMakerManager
+    {
         private readonly IEnumerable<IDecisionMaker> _decisionMakers;
         private readonly ILogger<DecisionMakerManager> _logger;
 
         public DecisionMakerManager(IEnumerable<IDecisionMaker> decisionMakers, ILogger<DecisionMakerManager> logger)
-		{
+        {
             _decisionMakers = decisionMakers;
             _logger = logger;
         }
