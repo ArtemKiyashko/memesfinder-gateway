@@ -26,18 +26,17 @@ namespace MemesFinderGateway
 
         [FunctionName("MemesFinderGateway")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] Update tgUpdate,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] string tgRawUpdate,
             ILogger log)
         {
-            string messageString = tgUpdate.ToJson();
-            log.LogInformation($"Update received: {messageString}");
+            log.LogInformation($"Update received: {tgRawUpdate}");
 
-            var decision = await _deciscionMakerManager.GetFinalDecisionAsync(tgUpdate);
+            var decision = await _deciscionMakerManager.GetFinalDecisionAsync(tgRawUpdate.ToTgUpdate());
 
             if (!decision.Decision)
                 return HandleNegativeDecision(log, decision);
 
-            return await SendMessageToServiceBus(log, messageString);
+            return await SendMessageToServiceBus(log, tgRawUpdate);
         }
 
         private async Task<IActionResult> SendMessageToServiceBus(ILogger log, string messageString)

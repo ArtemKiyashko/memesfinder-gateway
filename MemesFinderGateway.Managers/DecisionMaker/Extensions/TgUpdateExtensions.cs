@@ -6,10 +6,10 @@ namespace MemesFinderGateway.Managers.DecisionMaker.Extensions
 {
 	public static class TgUpdateExtensions
 	{
-		public static Chat? GetChat(this Update tgUpdate) => tgUpdate.Type switch
+		public static Chat? GetChat(this Update tgUpdate) => tgUpdate?.Type switch
 		{
-			UpdateType.EditedMessage => tgUpdate.EditedMessage.Chat,
-			UpdateType.Message => tgUpdate.Message.Chat,
+			UpdateType.EditedMessage => tgUpdate?.EditedMessage?.Chat,
+			UpdateType.Message => tgUpdate?.Message?.Chat,
 			_ => null
 		};
 	}
