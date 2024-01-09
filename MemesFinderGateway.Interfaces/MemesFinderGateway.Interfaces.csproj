@@ -17,7 +17,7 @@
     <Folder Include="AzureClients\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Telegram.Bot" Version="19.0.0-preview.2" />
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.1" />
+    <PackageReference Include="Telegram.Bot" Version="19.0.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.17.1" />
   </ItemGroup>
 </Project>
