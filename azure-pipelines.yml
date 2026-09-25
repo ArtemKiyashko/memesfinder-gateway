@@ -11,7 +11,7 @@ variables:
   azureSubscription: 'Azure Vostok (60447d26-d388-4a2b-a8cd-45114f7099a8)'
 
   # Agent VM image name
-  vmImageName: 'windows-2019'
+  vmImageName: 'ubuntu-22.04'
 
   # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/MemesFinderGateway'
