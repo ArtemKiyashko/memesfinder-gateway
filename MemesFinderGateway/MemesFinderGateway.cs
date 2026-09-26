@@ -2,12 +2,12 @@
 using MemesFinderGateway.Extensions;
 using MemesFinderGateway.Interfaces.AzureClients;
 using MemesFinderGateway.Interfaces.DecisionMaker;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
 
@@ -17,30 +17,39 @@ namespace MemesFinderGateway
     {
         private readonly IServiceBusClient _serviceBusClient;
         private readonly IDecisionMakerManager _deciscionMakerManager;
+        private readonly ILogger<MemesFinderGateway> _logger;
 
-        public MemesFinderGateway(IServiceBusClient serviceBusClient, IDecisionMakerManager deciscionMakerManager)
+        public MemesFinderGateway(IServiceBusClient serviceBusClient, IDecisionMakerManager deciscionMakerManager, ILogger<MemesFinderGateway> logger)
         {
             _serviceBusClient = serviceBusClient;
             _deciscionMakerManager = deciscionMakerManager;
+            _logger = logger;
         }
 
-        [FunctionName("MemesFinderGateway")]
-        public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] Update tgUpdate,
-            ILogger log)
+        [Function("MemesFinderGateway")]
+        public async Task<HttpResponseData> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData request,
+            [FromBody] Update tgUpdate)
         {
+            if (tgUpdate is null)
+            {
+                var invalidResponse = request.CreateResponse(HttpStatusCode.BadRequest);
+                await invalidResponse.WriteStringAsync("Invalid Telegram update");
+                return invalidResponse;
+            }
+
             string messageString = tgUpdate.ToJson();
-            log.LogInformation($"Update received: {messageString}");
+            _logger.LogInformation("Update received: {TelegramUpdate}", messageString);
 
             var decision = await _deciscionMakerManager.GetFinalDecisionAsync(tgUpdate);
 
             if (!decision.Decision)
-                return HandleNegativeDecision(log, decision);
+                return await HandleNegativeDecision(request, decision);
 
-            return await SendMessageToServiceBus(log, messageString);
+            return await SendMessageToServiceBus(request, messageString);
         }
 
-        private async Task<IActionResult> SendMessageToServiceBus(ILogger log, string messageString)
+        private async Task<HttpResponseData> SendMessageToServiceBus(HttpRequestData request, string messageString)
         {
             try
             {
@@ -48,21 +57,25 @@ namespace MemesFinderGateway
                 ServiceBusMessage serviceBusMessage = new(messageString);
                 await sender.SendMessageAsync(serviceBusMessage);
 
-                return new OkResult();
+                return request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Error sending to service bus: {0}", messageString);
-                return new BadRequestObjectResult("Something went wrong, try again later");
+                _logger.LogError(ex, "Error sending Telegram update to Service Bus");
+                var response = request.CreateResponse(HttpStatusCode.BadRequest);
+                await response.WriteAsJsonAsync("Something went wrong, try again later");
+                return response;
             }
         }
 
-        private static IActionResult HandleNegativeDecision(ILogger log, DecisionManagerResult decision)
+        private async Task<HttpResponseData> HandleNegativeDecision(HttpRequestData request, DecisionManagerResult decision)
         {
             var aggregatedMessages = decision.Messages
                 .Aggregate((f, s) => $"{f}{Environment.NewLine}{s}");
-            log.LogInformation($"Negative decision taken: {aggregatedMessages}");
-            return new OkObjectResult(aggregatedMessages);
+            _logger.LogInformation("Negative decision taken: {DecisionMessages}", aggregatedMessages);
+            var response = request.CreateResponse(HttpStatusCode.OK);
+            await response.WriteAsJsonAsync(aggregatedMessages);
+            return response;
         }
     }
 }
