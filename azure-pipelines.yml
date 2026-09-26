@@ -27,24 +27,21 @@ stages:
       vmImage: $(vmImageName)
 
     steps:
+    - task: UseDotNet@2
+      displayName: Use .NET 10 SDK
+      inputs:
+        packageType: sdk
+        version: 10.x
     - task: DotNetCoreCLI@2
-      displayName: Build
+      displayName: Publish
       inputs:
-        command: 'build'
-        projects: |
-          $(workingDirectory)/*.csproj
-        arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
-
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        replaceExistingArchive: true
-
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        command: publish
+        publishWebProjects: false
+        projects: '$(workingDirectory)/*.csproj'
+        arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/$(Build.BuildId)'
+        zipAfterPublish: true
+        modifyOutputPath: false
+    - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)/$(Build.BuildId).zip'
       artifact: drop
 
 - stage: DeployTest
