@@ -11,7 +11,6 @@ using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using Azure.Core.Serialization;
 using OpenTelemetry.Trace;
 
 var builder = FunctionsApplication.CreateBuilder(args);
@@ -22,9 +21,6 @@ builder.Services.AddOpenTelemetry()
     .WithTracing(tracing => tracing.AddSource("Azure.Messaging.ServiceBus.*"))
     .UseFunctionsWorkerDefaults()
     .UseAzureMonitorExporter();
-
-builder.Services.Configure<WorkerOptions>(options =>
-    options.Serializer = new NewtonsoftJsonObjectSerializer());
 
 builder.Services.Configure<ServiceBusOptions>(builder.Configuration.GetSection("ServiceBusOptions"));
 builder.Services.AddAzureClients(clientBuilder =>
